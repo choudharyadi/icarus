@@ -79,6 +79,10 @@ def controller(drone, keyboard, timestep):
         if key not in drone.key_states or not drone.key_states[key]:
             visualize_checkpoints()
         drone.key_states[key] = True
+    elif key == ord('P'):
+        if key not in drone.key_states or not drone.key_states[key]:
+            drone.capture_image()
+        drone.key_states[key] = True
     elif key == ord('Q'):
         return False
     else:
@@ -276,10 +280,16 @@ def start_course_with_checkpoints(drone):
             
             checkpoint_start_time = drone.robot.getTime()
             stabilization_time = float(checkpoint.stabilization_time)
+            photo_taken = False
             
             while drone.robot.getTime() - checkpoint_start_time < stabilization_time:
                 drone.robot.step(drone.timestep)
                 drone.route_recorder.record_point(drone)
+                
+                # Take photo at midpoint of stabilization
+                if not photo_taken and (drone.robot.getTime() - checkpoint_start_time) > stabilization_time / 2:
+                    drone.capture_image()
+                    photo_taken = True
         
         current_time = drone.robot.getTime()
         lap_time = current_time - lap_start_time

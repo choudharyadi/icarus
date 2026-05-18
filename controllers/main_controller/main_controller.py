@@ -31,6 +31,7 @@ def main():
     print("C: Start course with checkpoints")
     print("X: Reset checkpoints")
     print("V: Visualize checkpoint data")
+    print("P: Take picture")
     print("Q: Quit")
     
     while robot.step(timestep) != -1:

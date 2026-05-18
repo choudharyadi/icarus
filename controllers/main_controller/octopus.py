@@ -296,3 +296,53 @@ class Octopus:
             past_y_global = y_global
 
         return False
+
+    def get_camera_image(self):
+        """
+        Returns the current camera image as bytes.
+        The image is in RGB format with width and height as defined in initialization.
+        """
+        return self.camera.getImage()
+
+    def capture_image(self):
+        """
+        Captures and saves a camera image with timestamp.
+        Returns the filename of the saved image.
+        """
+        try:
+            from PIL import Image
+            import numpy as np
+            import os
+            
+            # Create pictures directory if it doesn't exist
+            if not os.path.exists('pictures'):
+                os.makedirs('pictures')
+            
+            # Get image data (Webots returns RGBA format)
+            image_data = self.get_camera_image()
+            
+            # Convert RGBA bytes to numpy array
+            image_array = np.frombuffer(image_data, dtype=np.uint8)
+            image_array = image_array.reshape((self.camera_height, self.camera_width, 4))
+            
+            # Convert RGBA to RGB (drop alpha channel and convert BGR to RGB)
+            image_bgr = image_array[:, :, :3]
+            image_rgb = image_bgr[:, :, ::-1]  # Reverse color channels BGR -> RGB
+            
+            # Create PIL Image from numpy array
+            image = Image.fromarray(image_rgb, 'RGB')
+            
+            # Create filename with timestamp
+            timestamp = self.robot.getTime()
+            filename = f'pictures/camera_{timestamp:.2f}.png'
+            
+            # Save image
+            image.save(filename)
+            print(f"\nPicture saved: {filename}")
+            return filename
+        except ImportError:
+            print("\nError: PIL/Pillow or NumPy not installed. Install with: pip install Pillow numpy")
+            return None
+        except Exception as e:
+            print(f"\nError capturing image: {e}")
+            return None
