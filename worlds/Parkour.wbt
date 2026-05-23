@@ -7,7 +7,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/Road.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Pavement.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/factory/manhole/protos/SquareManhole.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/solids/protos/SolidPipe.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
 
 WorldInfo {
@@ -23,8 +22,8 @@ WorldInfo {
   }
 }
 Viewpoint {
-  orientation -0.04404789002375721 0.024543382500848344 0.9987278937527839 2.1259698180213573
-  position 34.56985634850558 -50.284817664277796 7.8642923546253245
+  orientation -0.07527224148270367 0.03827508231643388 0.9964281749006497 2.2036876118028976
+  position 50.53357190171725 -74.08616873004354 16.93270244769249
   near 0.2
   follow "Crazyflie"
   followSmoothness 0.2
@@ -60,175 +59,340 @@ Road {
 SquareManhole {
   translation 0 0 -0.03
 }
-# Path of Square Ring Frames
-# Outer: 2.7m x 2.7m, Inner: 1.5m x 1.5m, Depth: 0.26m
-
-# VERTICAL GATE TEMPLATE - Rectangular frame with vertical opening facing horizontally
-# Each gate has:
-#   - 2 vertical posts (0.26m x 0.26m x 2.0m height)
-#   - 2 horizontal beams at top and bottom (1.5m x 0.26m x 0.26m depth)
-# The 1.5m x 2.0m opening faces horizontally (perpendicular to ground)
-
-# Gate 1 at (0, 0, 3.13) - theta = 0
-# Left vertical post
 Solid {
   translation -0.75 0 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate1_vertical_left"
 }
-# Right vertical post
 Solid {
   translation 0.75 0 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate1_vertical_right"
 }
-# Top horizontal beam
 Solid {
   translation 0 0 4.03
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate1_horizontal_top"
 }
-# Bottom horizontal beam
 Solid {
   translation 0 0 2.23
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate1_horizontal_bottom"
 }
-
-# Gate 2 at (6, 0, 3.13) - theta = 0
-# Left vertical post
 Solid {
   translation 5.25 0 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate2_vertical_left"
 }
-# Right vertical post
 Solid {
   translation 6.75 0 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate2_vertical_right"
 }
-# Top horizontal beam
 Solid {
   translation 6 0 4.03
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate2_horizontal_top"
 }
-# Bottom horizontal beam
 Solid {
   translation 6 0 2.23
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate2_horizontal_bottom"
 }
-
-# Gate 3 at (12, 0, 3.13) - theta = 0
-# Left vertical post
 Solid {
   translation 11.25 0 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate3_vertical_left"
 }
-# Right vertical post
 Solid {
   translation 12.75 0 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate3_vertical_right"
 }
-# Top horizontal beam
 Solid {
   translation 12 0 4.03
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate3_horizontal_top"
 }
-# Bottom horizontal beam
 Solid {
   translation 12 0 2.23
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate3_horizontal_bottom"
 }
-
-# Gate 4 at (12, 6, 3.13) - theta = 0
-# Left vertical post
 Solid {
   translation 11.25 6 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate4_vertical_left"
 }
-# Right vertical post
 Solid {
   translation 12.75 6 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate4_vertical_right"
 }
-# Top horizontal beam
 Solid {
   translation 12 6 4.03
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate4_horizontal_top"
 }
-# Bottom horizontal beam
 Solid {
   translation 12 6 2.23
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate4_horizontal_bottom"
 }
-
-# Gate 5 at (0, 6, 3.13) - theta = 0
-# Left vertical post
 Solid {
   translation -0.75 6 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate5_vertical_left"
 }
-# Right vertical post
 Solid {
   translation 0.75 6 3.13
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 0.26 0.26 2.0} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 0.26 0.26 2
+      }
+    }
+  ]
   name "gate5_vertical_right"
 }
-# Top horizontal beam
 Solid {
   translation 0 6 4.03
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate5_horizontal_top"
 }
-# Bottom horizontal beam
 Solid {
   translation 0 6 2.23
-  rotation 0 0 1 0
-  children [Shape {geometry Box {size 1.5 0.26 0.26} appearance PBRAppearance {baseColor 1 0 0 roughness 0.5 metalness 0}}]
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.5
+        metalness 0
+      }
+      geometry Box {
+        size 1.5 0.26 0.26
+      }
+    }
+  ]
   name "gate5_horizontal_bottom"
 }
-
 Crazyflie {
-  hidden linearVelocity_0 3.0937909114996016e-09 5.715919990840879e-10 -3.3696383300864847e-07
-  hidden angularVelocity_0 -3.325130430227295e-10 -2.6835129983275614e-10 -7.383060599805101e-15
-  translation -1.5886959074558364 4.677576703801574 3.272865950632351
-  rotation 0 0 1 -1.239
-  scale 3
+  hidden linearVelocity_0 -8.485210339294662e-07 5.50910122482478e-07 -5.2157986973535826e-09
+  hidden angularVelocity_0 -3.4147845409727164e-07 3.222908078305671e-07 2.198921024004264e-07
+  translation -4.68639580907349e-05 -4.3530705921296934e-05 2.999999985344384
+  rotation -3.1505186271223484e-07 3.376693171883647e-08 0.9999999999999498 1.5895839045953468
   controller "main_controller"
+  supervisor TRUE
   extensionSlot [
+    Gyro {
+      name "gyro(1)"
+    }
+    InertialUnit {
+    }
     Camera {
-      name "camera"
       translation 0.03 0 0.01
       fieldOfView 0.87
       width 324
