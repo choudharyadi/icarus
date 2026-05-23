@@ -1,42 +1,36 @@
-"""main_controller controller."""
-
-from controller import Robot, Keyboard
+from controller import Robot
 from octopus import Octopus
 from pid_controller import pid_velocity_fixed_height_controller
-from key_controller import controller
-
+from gateDetector import GateDetector
+import numpy as np
+import cv2
 
 def main():
     robot = Robot()
     timestep = int(robot.getBasicTimeStep())
-    
-    keyboard = Keyboard()
-    keyboard.enable(timestep)
 
     pid_controller = pid_velocity_fixed_height_controller()
     drone = Octopus(robot, timestep, pid_controller)
+    detector = GateDetector()
 
+    print("Attempting hover...")
     if not drone.hover():
-        print("Hover failed!")
+        print("Hover failed — check GPS/IMU sensors")
         return
 
-    print("Hover successful!")
-    print("\n=== Drone Control System ===")
-    print("Controls:")
-    print("W/S: Increase/Decrease altitude")
-    print("A/D: Move left/right")
-    print("Arrow Up/Down: Move forward/backward")
-    print("Arrow Left/Right: Turn left/right")
-    print("R: Start/Stop recording checkpoints")
-    print("C: Start course with checkpoints")
-    print("X: Reset checkpoints")
-    print("V: Visualize checkpoint data")
-    print("P: Take picture")
-    print("Q: Quit")
-    
+    print("Hovering! Starting detection loop...")
+
+    frame_count = 0
     while robot.step(timestep) != -1:
-        if not controller(drone, keyboard, timestep):
-            break
+        frame_count += 1
+
+        drone.stay_hover()
+
+        if frame_count % 10 == 0:
+            raw = drone.camera.getImage()
+            img = np.frombuffer(raw, np.uint8).reshape((drone.camera_height, drone.camera_width, 4))
+            img_bgr = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+            detector.get_relative_gate_data_from_frame(img_bgr)
 
 if __name__ == '__main__':
     main()

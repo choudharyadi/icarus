@@ -163,8 +163,6 @@ class RelativeVisualizer:
         normal_vector = R_final @ np.array([1, 0, 0])
         self.plotter.add_arrows(cent=rel_pos, direction=normal_vector, mag=0.6, color="red")
 
-        print(f"Rendered 3D Gate at: X={rel_pos[0]:.2f}m, Y={rel_pos[1]:.2f}m, Z={rel_pos[2]:.2f}m")
-
     def run(self):
         self.plotter.add_legend()
         
@@ -185,7 +183,7 @@ if __name__ == "__main__":
     detector = GateDetector()
     viz = RelativeVisualizer()
 
-    img_path = '/Users/adityachoudhary/Documents/Coding/autonomous-parkour-drone/controllers/main_controller/pictures/camera_1040.58.png'
+    img_path = 'pictures/camera_1040.58.png'
     results = detector.get_relative_gate_data(img_path)
 
     if len(results) == 0:
