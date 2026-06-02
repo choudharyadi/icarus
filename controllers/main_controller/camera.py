@@ -73,9 +73,12 @@ class GateDetector:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
         # Show the result
-        cv2.imshow("Gate Detection Test", frame)
-        cv2.waitKey(0) # Press any key to close the window
-        cv2.destroyAllWindows()
+        try:
+            cv2.imshow("Gate Detection Test", frame)
+            cv2.waitKey(0) # Press any key to close the window
+            cv2.destroyAllWindows()
+        except Exception:
+            pass  # Headless environment - skip visualization
         
         return found_data
 

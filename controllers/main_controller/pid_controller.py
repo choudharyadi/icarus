@@ -13,6 +13,10 @@ class pid_velocity_fixed_height_controller():
 
     def pid(self, dt, desired_vx, desired_vy, desired_yaw_rate, desired_altitude, actual_roll, actual_pitch, actual_yaw_rate,
             actual_altitude, actual_vx, actual_vy):
+        
+        # Prevent division by zero
+        if dt <= 0:
+            dt = 0.01
       
         gains = {"kp_att_y": 1, "kd_att_y": 0.5, "kp_att_rp": 0.5, "kd_att_rp": 0.1,
                  "kp_vel_xy": 2, "kd_vel_xy": 0.5, "kp_z": 10, "ki_z": 5, "kd_z": 5}

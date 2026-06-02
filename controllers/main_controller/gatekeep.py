@@ -93,9 +93,12 @@ class GateDetector:
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
 
         # Show OpenCV window briefly, closes automatically when PyVista launches
-        cv2.imshow("Gate Detection - PnP Solver Baseline", frame)
-        cv2.waitKey(1500) 
-        cv2.destroyAllWindows()
+        try:
+            cv2.imshow("Gate Detection - PnP Solver Baseline", frame)
+            cv2.waitKey(1500) 
+            cv2.destroyAllWindows()
+        except Exception:
+            pass  # Headless environment - skip visualization
         
         return found_data
 class RelativeVisualizer:

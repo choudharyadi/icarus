@@ -250,8 +250,12 @@ class GateDetector:
         cv2.line(grid, (W, 0),  (W, H*2),  (60, 60, 60), 1)  # vertical
         cv2.line(grid, (0, H),  (W*2, H),  (60, 60, 60), 1)  # horizontal
 
-        cv2.imshow("Gate Detection Debug", grid)
-        cv2.waitKey(1)
+        # Display visualization only if running in GUI environment
+        try:
+            cv2.imshow("Gate Detection Debug", grid)
+            cv2.waitKey(1)
+        except Exception:
+            pass  # Headless environment - skip visualization
 
     def get_relative_gate_data_from_frame(self, frame):
         """
