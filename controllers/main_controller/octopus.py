@@ -296,6 +296,36 @@ class Octopus:
             past_y_global = y_global
 
         return False
+    def goto_local(self, local_target_pos, kp_pos=None, threshold=None, max_vel=None):
+        """
+        Calculates a global waypoint from a relative local body frame vector,
+        then commands the drone to fly to it.
+        local_target_pos: list/array of [forward_x, left_y, up_z] relative to drone
+        """
+        # 1. Get the current global position and heading
+        x_global, y_global, altitude = self.gps.getValues()
+        _, _, yaw = self.imu.getRollPitchYaw()
+
+        local_x = local_target_pos[0] # Forward
+        local_y = local_target_pos[1] # Left
+        local_z = local_target_pos[2] # Up
+
+        # 2. Transform the local relative offsets into global offsets using the Yaw angle
+        # (Rotates local body coordinate frame to match world coordinate frame)
+        cos_yaw = cos(yaw)
+        sin_yaw = sin(yaw)
+
+        # In your goto(): v_x_local = v_x_global * cos_yaw + v_y_global * sin_yaw
+        # To go backward from local back to global frame:
+        global_target_x = x_global + (local_x * cos_yaw - local_y * sin_yaw)
+        global_target_y = y_global + (local_x * sin_yaw + local_y * cos_yaw)
+        global_target_z = altitude + local_z # Altitude is independent of yaw orientation
+
+        print(f"[LOCAL -> GLOBAL] Target transformed to World coordinates: X={global_target_x:.2f}, Y={global_target_y:.2f}, Z={global_target_z:.2f}")
+
+        # 3. Hand off the newly calculated global position to your existing coordinate tracking logic
+        return self.goto([global_target_x, global_target_y, global_target_z], 
+                         kp_pos=kp_pos, threshold=threshold, max_vel=max_vel)
 
     def get_camera_image(self):
         """

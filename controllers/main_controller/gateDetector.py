@@ -181,7 +181,7 @@ class GateDetector:
                     cv2.drawContours(p3, [cnt], 0, (80, 80, 80), 1)
                 else:
                     # Inner contour → this is a gate candidate
-                    if area > 80:
+                    if area > 160:
                         # Draw the minAreaRect box in orange
                         rect = cv2.minAreaRect(cnt)
                         box_pts = cv2.boxPoints(rect)
