@@ -147,7 +147,7 @@ class Octopus:
         v_y = 0
 
         # Only altitude control is active during hover
-        motor_power = self.pid_controller.pid(0.01, 0, 0, 0, self.current_hover_altitude,
+        motor_power = self.pid_controller.pid(self.timestep / 1000.0, 0, 0, 0, self.current_hover_altitude,
                                               roll, pitch, yaw_rate,
                                               altitude, v_x, v_y)
 
@@ -159,7 +159,8 @@ class Octopus:
 
         return True
 
-    def goto(self, target_pos, kp_pos=None, threshold=None, max_vel=None):
+    def goto(self, target_pos, kp_pos=None, threshold=None, max_vel=None,
+             yaw_alignment_threshold=0.8):
         """
         Makes the drone go to a specific position.
         target_pos should be a list/tuple of [x, y, z]
@@ -187,6 +188,7 @@ class Octopus:
         max_pitch_roll = 0.3  # Maksimum pitch ve roll açısı (radyan)
         pitch_roll_stable_count = 0  # Dengeli durum sayacı
         required_stable_steps = 5  # Gerekli dengeli adım sayısı
+        last_instability_warning = -1.0
 
         while self.robot.step(self.timestep) != -1:
             # Rota noktasını kaydet
@@ -209,7 +211,9 @@ class Octopus:
                 pitch_roll_stable_count += 1
             else:
                 pitch_roll_stable_count = 0
-                print(f"Drone dengesiz! Roll: {roll:.2f}, Pitch: {pitch:.2f}")
+                if current_time - last_instability_warning >= 1.0:
+                    print(f"Drone dengesiz! Roll: {roll:.2f}, Pitch: {pitch:.2f}")
+                    last_instability_warning = current_time
 
             # Calculate velocities
             if dt > 1e-5:
@@ -255,10 +259,13 @@ class Octopus:
             yaw_desired = np.clip(yaw_diff * 0.5, -0.5, 0.5)
 
             # Hareket kontrolü
-            if abs(yaw_diff) < 0.1:  # ~5.7 derece
-                # İleri hareket
+            if abs(yaw_diff) < yaw_alignment_threshold:
+                # Reduce translation while turning instead of stopping completely.
+                heading_scale = max(0.15, np.cos(abs(yaw_diff)))
                 desired_forward_speed_raw = error_x_global * cos_yaw + error_y_global * sin_yaw
                 desired_sideways_speed_raw = -error_x_global * sin_yaw + error_y_global * cos_yaw
+                desired_forward_speed_raw *= heading_scale
+                desired_sideways_speed_raw *= heading_scale
                 
                 # Denge düzeltmesi
                 if abs(roll) > max_pitch_roll:

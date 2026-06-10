@@ -30,6 +30,7 @@ def main():
     # ─── MEMORY STORAGE ───────────────────────────────────────────────────
     # Stores a list of global unique gate coordinates: [ [X1, Y1, Z1], [X2, Y2, Z2], ... ]
     remembered_gates = []
+    last_search_log_time = -2.0
     # Distance threshold to consider a detection as an "already known" gate
     DUPLICATE_THRESHOLD = 3
     # ──────────────────────────────────────────────────────────────────────
@@ -63,8 +64,9 @@ def main():
                 for idx, known_gate_pos in enumerate(remembered_gates):
                     # Distance between newly detected gate and a remembered gate
                     if np.linalg.norm(detected_global_pos - known_gate_pos) < DUPLICATE_THRESHOLD:
-                        # Update existing entry with fresher/closer camera data
-                        remembered_gates[idx] = detected_global_pos
+                        # Close partial views are less reliable; preserve the established center.
+                        if np.linalg.norm(np.array(current_gps) - known_gate_pos) >= 3.0:
+                            remembered_gates[idx] = 0.75 * known_gate_pos + 0.25 * detected_global_pos
                         is_duplicate = True
                         break
                 
@@ -79,6 +81,7 @@ def main():
             closest_idx = np.argmin(distances)
             target_global_gate = remembered_gates[closest_idx]
             target_distance = distances[closest_idx]
+            clear_after_reach = False
 
             # --- DYNAMIC TARGETING ADJUSTMENT ---
             # If we are close to the target gate, we need to aim PAST it to cross it.
@@ -88,29 +91,43 @@ def main():
                 # Calculate vector direction from drone to gate to know which way is "forward" through it
                 direction_vector = target_global_gate - np.array(current_gps)
                 direction_vector[2] = 0 # keep it flat on horizontal plane
-                unit_direction = direction_vector / np.linalg.norm(direction_vector)
-                
-                # Create overshoot waypoint 2.0 meters past the gate center
-                final_target = target_global_gate + (unit_direction * 2.0)
-                
-                # Once we are highly likely to have cleared it, drop it from memory so we don't turn back
-                if target_distance < 0.6:
-                    print("[MEMORY] Gate cleared! Removing from map list.")
+                horizontal_distance = np.linalg.norm(direction_vector)
+                if horizontal_distance < 1e-6:
                     remembered_gates.pop(closest_idx)
+                    continue
+                unit_direction = direction_vector / horizontal_distance
+                
+                # Create an exit waypoint far enough beyond the gate to fully clear its frame.
+                final_target = target_global_gate + (unit_direction * 3.0)
+                
+                # Only remove the gate after the exit waypoint is actually reached.
+                if target_distance < 0.6:
+                    clear_after_reach = True
             else:
                 final_target = target_global_gate
                 print(f"[TRACKING MEMORY] Headed to closest mapped gate. Distance: {target_distance:.2f}m")
 
-            # Fly directly using the GLOBAL function (since final_target is world coordinates)
-            # Switch back to drone.goto instead of goto_local here!
-            reached = drone.goto(final_target, threshold=0.4)
+            if target_distance < 2.5:
+                reached = drone.goto(
+                    final_target,
+                    threshold=0.4,
+                    max_vel=0.6,
+                    yaw_alignment_threshold=0.2,
+                )
+            else:
+                reached = drone.goto(final_target, threshold=0.4)
             
             if reached:
                 print("[SUCCESS] Point reached.")
+                if clear_after_reach:
+                    print("[MEMORY] Gate cleared! Removing from map list.")
+                    remembered_gates.pop(closest_idx)
 
         else:
-            # 4. Fallback search mode: Spin slowly if completely blind and memory is empty
-            print("[SEARCHING] Map is empty, looking around to discover first gate...")
+            # 4. Fallback search mode: hold position while the camera looks for a gate.
+            if robot.getTime() - last_search_log_time >= 2.0:
+                print("[SEARCHING] Map is empty, looking around to discover first gate...")
+                last_search_log_time = robot.getTime()
             drone.stay_hover()
 
 if __name__ == '__main__':
