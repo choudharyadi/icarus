@@ -87,11 +87,11 @@ import cv2
 import numpy as np
 
 class GateDetector:
-    def __init__(self):
-        self.W, self.H = 324, 324
-        self.FOV = 0.87
-        self.f = (self.W / 2) / np.tan(self.FOV / 2)
-        self.cam_offset = np.array([0.03, 0.0, 0.01])
+    def __init__(self, width=640, height=360):
+        self.W, self.H = width, height
+        self.fx = 320.0
+        self.fy = 320.0
+        self.camera_pitch = np.radians(20.0)
         
         # --- GATE DIMENSIONS ---
         self.GATE_INNER_W = 1.5  
@@ -99,9 +99,9 @@ class GateDetector:
 
         # --- CAMERA INTRINSIC MATRIX ---
         self.camera_matrix = np.array([
-            [self.f,    0, self.W / 2],
-            [   0, self.f, self.H / 2],
-            [   0,    0,            1]
+            [self.fx,       0, self.W / 2],
+            [      0, self.fy, self.H / 2],
+            [      0,       0,          1]
         ], dtype=np.float32)
         
         self.dist_coeffs = np.zeros((4, 1), dtype=np.float32)
@@ -302,10 +302,13 @@ class GateDetector:
 
                         # Remap from OpenCV camera frame (X right, Y down, Z forward)
                         # to drone frame (X forward, Y left, Z up)
+                        camera_pos = np.array([cam_z, -cam_x, -cam_y])
+                        cos_pitch = np.cos(self.camera_pitch)
+                        sin_pitch = np.sin(self.camera_pitch)
                         rel_pos = np.array([
-                            cam_z + self.cam_offset[0],
-                            -cam_x + self.cam_offset[1],
-                            -cam_y + self.cam_offset[2]
+                            cos_pitch * camera_pos[0] - sin_pitch * camera_pos[2],
+                            camera_pos[1],
+                            sin_pitch * camera_pos[0] + cos_pitch * camera_pos[2]
                         ])
 
                         R_matrix, _ = cv2.Rodrigues(rvec)
@@ -315,4 +318,3 @@ class GateDetector:
         self._draw_debug_viz(frame, contours, hierarchy, found_data)
         return found_data 
     
-

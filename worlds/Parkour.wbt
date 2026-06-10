@@ -8,6 +8,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Pavement.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/factory/manhole/protos/SquareManhole.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
+EXTERNPROTO "../protos/QualifierGate.proto"
 
 WorldInfo {
   info [
@@ -60,203 +61,17 @@ SquareManhole {
   translation 0 0 -0.03
 }
 
-Solid {
-  translation -0.75 6 3.13
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 0.26 0.26 2
-      }
-    }
-  ]
-  name "gate1_vertical_left"
+QualifierGate {
+  translation 0 6 3.13
+  name "gate1"
 }
-Solid {
-  translation 0.75 6 3.13
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 0.26 0.26 2
-      }
-    }
-  ]
-  name "gate1_vertical_right"
+QualifierGate {
+  translation -1.5 13.5 3.13
+  name "gate2"
 }
-Solid {
-  translation 0 6 4.03
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 1.5 0.26 0.26
-      }
-    }
-  ]
-  name "gate1_horizontal_top"
-}
-Solid {
-  translation 0 6 2.23
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 1.5 0.26 0.26
-      }
-    }
-  ]
-  name "gate1_horizontal_bottom"
-}
-
-
-
-Solid {
-  translation -2.25 13.5 3.13
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 0.26 0.26 2
-      }
-    }
-  ]
-  name "gate2_vertical_left"
-}
-Solid {
-  translation -0.75 13.5 3.13
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 0.26 0.26 2
-      }
-    }
-  ]
-  name "gate2_vertical_right"
-}
-Solid {
-  translation -1.5 13.5 4.03
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 1.5 0.26 0.26
-      }
-    }
-  ]
-  name "gate2_horizontal_top"
-}
-Solid {
-  translation -1.5 13.5 2.23
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 1.5 0.26 0.26
-      }
-    }
-  ]
-  name "gate2_horizontal_bottom"
-}
-
-
-
-Solid {
-  translation 4.75 27.5 3.13
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 0.26 0.26 2
-      }
-    }
-  ]
-  name "gate3_vertical_left"
-}
-Solid {
-  translation 6.25 27.5 3.13
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 0.26 0.26 2
-      }
-    }
-  ]
-  name "gate3_vertical_right"
-}
-Solid {
-  translation 5.5 27.5 4.03
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 1.5 0.26 0.26
-      }
-    }
-  ]
-  name "gate3_horizontal_top"
-}
-Solid {
-  translation 5.5 27.5 2.23
-  children [
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0 0
-        roughness 0.5
-        metalness 0
-      }
-      geometry Box {
-        size 1.5 0.26 0.26
-      }
-    }
-  ]
-  name "gate3_horizontal_bottom"
+QualifierGate {
+  translation 5.5 27.5 3.13
+  name "gate3"
 }
 Crazyflie {
   hidden linearVelocity_0 -8.485210339294662e-07 5.50910122482478e-07 -5.2157986973535826e-09
@@ -266,16 +81,12 @@ Crazyflie {
   controller "main_controller"
   supervisor TRUE
   extensionSlot [
-    Gyro {
-      name "gyro(1)"
-    }
-    InertialUnit {
-    }
     Camera {
-      translation 0.03 0 0.01
-      fieldOfView 0.87
-      width 324
-      height 324
+      rotation 0 1 0 -0.3490658504
+      name "qualifier_camera"
+      fieldOfView 1.5707963268
+      width 640
+      height 360
     }
   ]
 }

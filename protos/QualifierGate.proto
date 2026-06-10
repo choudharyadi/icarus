@@ -1,0 +1,94 @@
+#VRML_SIM R2025a utf8
+
+PROTO QualifierGate [
+  field SFVec3f translation 0 0 1.35
+  field SFRotation rotation 0 0 1 0
+  field SFString name "qualifier gate"
+]
+{
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    children [
+      Pose {
+        translation -1.05 0 0
+        children [
+          DEF GATE_SHAPE Shape {
+            appearance PBRAppearance {
+              baseColor 1 0 0
+              roughness 0.5
+              metalness 0
+            }
+            geometry Box {
+              size 0.6 0.26 2.7
+            }
+          }
+        ]
+      }
+      Pose {
+        translation 1.05 0 0
+        children [
+          USE GATE_SHAPE
+        ]
+      }
+      Pose {
+        translation 0 0 1.05
+        children [
+          DEF GATE_HORIZONTAL_SHAPE Shape {
+            appearance PBRAppearance {
+              baseColor 1 0 0
+              roughness 0.5
+              metalness 0
+            }
+            geometry Box {
+              size 1.5 0.26 0.6
+            }
+          }
+        ]
+      }
+      Pose {
+        translation 0 0 -1.05
+        children [
+          USE GATE_HORIZONTAL_SHAPE
+        ]
+      }
+    ]
+    boundingObject Group {
+      children [
+        Pose {
+          translation -1.05 0 0
+          children [
+            Box {
+              size 0.6 0.26 2.7
+            }
+          ]
+        }
+        Pose {
+          translation 1.05 0 0
+          children [
+            Box {
+              size 0.6 0.26 2.7
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 1.05
+          children [
+            Box {
+              size 1.5 0.26 0.6
+            }
+          ]
+        }
+        Pose {
+          translation 0 0 -1.05
+          children [
+            Box {
+              size 1.5 0.26 0.6
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

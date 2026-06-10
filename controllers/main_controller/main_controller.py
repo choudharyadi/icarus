@@ -11,7 +11,7 @@ def main():
 
     pid_controller = pid_velocity_fixed_height_controller()
     drone = Octopus(robot, timestep, pid_controller)
-    detector = GateDetector()
+    detector = GateDetector(drone.camera_width, drone.camera_height)
 
     print("Attempting hover...")
     if not drone.hover():

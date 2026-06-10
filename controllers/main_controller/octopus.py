@@ -42,8 +42,10 @@ class Octopus:
         self.right_lidar.enable(timestep)
 
         # Initialize camera
-        self.camera = robot.getDevice("camera")
-        self.camera.enable(timestep)
+        self.camera = robot.getDevice("qualifier_camera")
+        if self.camera is None:
+            self.camera = robot.getDevice("camera")
+        self.camera.enable(32)  # Closest multiple of the 8 ms step to the real 30 Hz stream.
         self.camera_width = self.camera.getWidth()
         self.camera_height = self.camera.getHeight()
 
