@@ -1,0 +1,13 @@
+# Icarus - AI Grand Prix Virtual Qualifier
+# Install into the same Python that Webots uses for controllers
+# (Webots > Preferences > General > Python command).
+
+# Comms (MAVLink 2 over UDP)
+pymavlink>=2.4
+
+# Vision
+opencv-python>=4.8
+numpy>=1.26
+
+# Tests
+pytest>=8.0

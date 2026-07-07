@@ -1,0 +1,205 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/SandyGround.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/factory/manhole/protos/SquareManhole.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/bitcraze/crazyflie/protos/Crazyflie.proto"
+EXTERNPROTO "../protos/QualifierGate.proto"
+
+WorldInfo {
+  info [
+    "AI Grand Prix - Virtual Qualifier 2"
+    "Harder course: slalom entry, sharper heading changes, larger altitude"
+    "envelope (1.8 m to 3.8 m) and tighter gate spacing."
+  ]
+  title "AI Grand Prix - Virtual Qualifier 2"
+  basicTimeStep 8
+  defaultDamping Damping {
+    linear 0.5
+    angular 0.5
+  }
+}
+Viewpoint {
+  orientation -0.25 0.06 0.966 2.75
+  position 38.0 -22.0 36.0
+  near 0.2
+  follow "Crazyflie"
+  followSmoothness 0.2
+}
+TexturedBackground {
+  luminosity 3
+}
+TexturedBackgroundLight {
+}
+Floor {
+  size 600 600
+  tileSize 6 6
+  appearance SandyGround {
+  }
+}
+SquareManhole {
+  translation 0 0 -0.03
+}
+
+QualifierGate {
+  translation 0 5 1.8
+  rotation 0 0 1 0
+  name "gate0"
+}
+QualifierGate {
+  translation -1.5 11 2.2
+  rotation 0 0 1 0.2618
+  name "gate1"
+}
+QualifierGate {
+  translation -3.5 17 2.8
+  rotation 0 0 1 0.2618
+  name "gate2"
+}
+QualifierGate {
+  translation -2.5 23.5 3.4
+  rotation 0 0 1 -0.2618
+  name "gate3"
+}
+QualifierGate {
+  translation 1.5 29 3.8
+  rotation 0 0 1 -0.6981
+  name "gate4"
+}
+QualifierGate {
+  translation 7 32.5 3.2
+  rotation 0 0 1 -1.1345
+  name "gate5"
+}
+QualifierGate {
+  translation 13.5 34 2.4
+  rotation 0 0 1 -1.4835
+  name "gate6"
+}
+QualifierGate {
+  translation 20 33.5 1.8
+  rotation 0 0 1 -1.9199
+  name "gate7"
+}
+QualifierGate {
+  translation 25.5 30 2.2
+  rotation 0 0 1 -2.3562
+  name "gate8"
+}
+QualifierGate {
+  translation 29 25 3
+  rotation 0 0 1 -2.7053
+  name "gate9"
+}
+QualifierGate {
+  translation 30.5 19 3.6
+  rotation 0 0 1 -2.9671
+  name "gate10"
+}
+QualifierGate {
+  translation 31 12.5 2
+  rotation 0 0 1 -3.1067
+  name "gate11"
+}
+
+DEF OBSTACLE_POLE_1 Solid {
+  translation 5 29.8 3
+  name "obstacle pole 1"
+  children [
+    DEF POLE1_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColor 0.45 0.45 0.5
+        roughness 0.8
+        metalness 0.2
+      }
+      geometry Cylinder {
+        height 6
+        radius 0.25
+      }
+    }
+  ]
+  boundingObject Cylinder {
+    height 6
+    radius 0.25
+  }
+}
+DEF OBSTACLE_BAR Solid {
+  translation 16.8 34 3.9
+  rotation 0 0 1 -0.06
+  name "obstacle bar"
+  children [
+    DEF BAR_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColor 0.3 0.4 0.6
+        roughness 0.7
+        metalness 0.1
+      }
+      geometry Box {
+        size 7 0.3 0.3
+      }
+    }
+  ]
+  boundingObject Box {
+    size 7 0.3 0.3
+  }
+}
+DEF BOUNDARY_WALL_1 Solid {
+  translation 34.5 27 1.5
+  rotation 0 0 1 0.5
+  name "boundary wall 1"
+  children [
+    DEF WALL1_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColor 0.92 0.92 0.9
+        roughness 0.9
+        metalness 0
+      }
+      geometry Box {
+        size 0.2 12 3
+      }
+    }
+  ]
+  boundingObject Box {
+    size 0.2 12 3
+  }
+}
+DEF BOUNDARY_WALL_2 Solid {
+  translation -8 14 1.5
+  rotation 0 0 1 0.32
+  name "boundary wall 2"
+  children [
+    DEF WALL2_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColor 0.92 0.92 0.9
+        roughness 0.9
+        metalness 0
+      }
+      geometry Box {
+        size 0.2 14 3
+      }
+    }
+  ]
+  boundingObject Box {
+    size 0.2 14 3
+  }
+}
+
+Crazyflie {
+  translation 0 0 0.015
+  rotation 0 0 1 1.5708
+  controller "dcl_sim_bridge"
+  supervisor TRUE
+  extensionSlot [
+    Camera {
+      rotation 0 1 0 -0.3490658504
+      name "qualifier_camera"
+      fieldOfView 1.5707963268
+      width 640
+      height 360
+    }
+    Accelerometer {
+    }
+  ]
+}

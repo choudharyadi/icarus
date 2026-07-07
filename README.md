@@ -1,282 +1,159 @@
-# Autonomous Parkour Drone
+# Icarus — AI Grand Prix Virtual Qualifier
 
-An advanced autonomous quadcopter system designed to navigate through parkour courses with optimal path planning, and comprehensive data analysis. Built on the Webots robotics simulation platform using a Crazyflie drone.
+Autonomous drone-racing stack for the **AI Grand Prix Virtual Qualifier**
+(spec `VADR-TS-002`, see `documents/competition_technical_specs.txt`),
+developed and raced entirely inside Webots against a faithful local replica
+of the competition simulator's interface.
 
 ![Webots](https://img.shields.io/badge/Webots-R2025a-blue)
-![Python](https://img.shields.io/badge/Python-3.x-green)
-
-## 🎬 Demo Video
-
-
-![](/assets/Parkour.gif)
-
-## Project Overview
-
-This project develops an autonomous quadcopter system capable of completing predefined parkour courses in minimum time by navigating through checkpoints. The system combines advanced sensor fusion, intelligent path planning, and precision control algorithms to achieve optimal performance.
-
-### Key Features
-
-- **Autonomous Navigation**: Complete autonomous flight through complex parkour courses
-- **Checkpoint Detection**: Real-time LiDAR-based obstacle and checkpoint detection
-- **Intelligent Pathfinding**: A* algorithm implementation for optimal route planning
-- **Data Analytics**: Comprehensive sensor data logging and performance analysis
-- **Manual Control**: Full manual flight control for training and testing
-- **Visualization**: Advanced 3D route visualization and performance charts
-- **Multi-lap Support**: Automated multi-lap course completion with timing
-
-## System Architecture
-
-### Core Components
+![Python](https://img.shields.io/badge/Python-3.12-green)
+![MAVLink](https://img.shields.io/badge/MAVLink-2-orange)
 
 ```
-controllers/main_controller/
-├── main_controller.py      # Main entry point and control loop
-├── octopus.py             # Drone control class with flight functions
-├── pid_controller.py      # PID control system for stability
-├── key_controller.py      # Manual control and course automation
-├── checkpoint_manager.py  # Checkpoint detection and management
-├── pathfinding.py         # A* pathfinding algorithm
-├── route_recorder.py      # Route data recording system
-├── route_visualizer.py    # Data visualization and analysis
-├── passage_point.py       # Checkpoint passage filtering
-└── checkpoints_charts.py  # Checkpoint data visualization
+┌─────────────────────────────┐         UDP          ┌─────────────────────────┐
+│  Webots world               │                      │  pilot/  (the entry)    │
+│  ┌───────────────────────┐  │  MAVLink 2 :14550    │  ┌───────────────────┐  │
+│  │ dcl_sim_bridge        │──┼──────────────────────┼─▶│ comms             │  │
+│  │  - flight controller  │  │  telemetry, race     │  │ state             │  │
+│  │  - MAVLink server     │◀─┼──────────────────────┼──│ perception (PnP)  │  │
+│  │  - race manager       │  │  setpoints, arm      │  │ planning          │  │
+│  │  - vision streamer    │──┼──────────────────────┼─▶│ guidance          │  │
+│  └───────────────────────┘  │  JPEG chunks :5600   │  └───────────────────┘  │
+└─────────────────────────────┘                      └─────────────────────────┘
 ```
 
-### Sensor Suite
+The pilot is **sim-agnostic**: it speaks only the interfaces defined in the
+technical spec (MAVLink 2 telemetry/commands + the chunked JPEG vision
+stream), so the same `pilot/` package runs unchanged against the real DCL
+simulator — only speed-envelope retuning in `pilot/config.py` is expected.
 
-- **GPS**: Precise positioning and navigation
-- **IMU**: Attitude estimation (roll, pitch, yaw)
-- **Gyroscope**: Angular velocity measurements
-- **LiDAR (4x)**: 360° obstacle detection (front, back, left, right)
-- **Camera**: Visual feedback and monitoring
+## Results (Webots, real-time physics @120 Hz)
 
-## Getting Started
+| Course | Gates | Time | Collisions |
+|---|---|---|---|
+| `worlds/Qualifier1.wbt` (11 gates, 80 m arc) | 11/11 | **39.6 s** | 0 |
+| `worlds/Qualifier2.wbt` (12 gates, slalom + 2 m altitude swings) | 12/12 | **35.1 s** | 0 |
 
-### Prerequisites
+## Quick start
 
-- **Webots R2025a** or newer
-- **Python 3.x**
-- **Required Python packages**:
-  ```bash
-  pip install numpy matplotlib json datetime math
-  ```
-
-### Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/ErsaGunTosun/autonomous-parkour-drone.git
-   cd autonomous-parkour-drone
-   ```
-
-2. **Open in Webots**:
-   - Launch Webots
-   - Open `worlds/Parkour.wbt`
-   - The simulation will automatically load the drone and parkour course
-
-3. **Run the simulation**:
-   - Press the play button in Webots
-   - The drone will automatically initialize and hover
-
-## Controls & Usage
-
-### Manual Control Mode
-
-| Key | Action |
-|-----|--------|
-| `W` / `S` | Increase / Decrease altitude |
-| `A` / `D` | Move left / right |
-| `↑` / `↓` | Move forward / backward |
-| `←` / `→` | Turn left / right |
-| `R` | Start/Stop checkpoint recording |
-| `C` | Start automated course with checkpoints |
-| `X` | Reset checkpoints |
-| `V` | Visualize checkpoint data |
-| `Q` | Quit |
-
-### Automated Operation Modes
-
-#### 1. Checkpoint Recording Mode
 ```bash
-# Press 'R' to start recording checkpoints
-# Fly manually through the course
-# Press 'R' again to stop recording
+# 1. Install deps into the Python that Webots uses
+#    (Webots > Preferences > General > Python command)
+python3 -m pip install -r requirements.txt
+
+# 2. Open worlds/Qualifier1.wbt in Webots and press Play.
+#    The bridge auto-launches the pilot; console shows [BRIDGE]/[PILOT]/[RACE].
+
+# 3. Or fully headless from a terminal:
+tools/race.sh 1        # Qualifier 1
+tools/race.sh 2        # Qualifier 2
+
+# 4. Unit tests (frames, wire formats, detector, planner):
+python3 -m pytest tests/ -q
 ```
 
-#### 2. Autonomous Course Mode
+To run the pilot manually (e.g. against the real simulator), disable
+auto-launch and start it yourself:
+
 ```bash
-# Press 'C' to start autonomous course completion
-# The drone will automatically navigate through recorded checkpoints
-# Supports multiple laps with performance tracking
+ICARUS_AUTOPILOT=0  # set in the environment Webots inherits, then press Play
+python3 pilot/main.py [--viz] [--save-frames]
 ```
 
-## Technical Details
-
-### Flight Control System
-
-The drone uses a sophisticated PID control system with:
-
-- **Altitude Control**: Maintains precise height with integral windup protection
-- **Velocity Control**: Smooth movement in 3D space
-- **Attitude Stabilization**: Roll, pitch, and yaw control
-- **Position Tracking**: GPS-based waypoint navigation
-
-### Checkpoint Detection Algorithm
-
-```python
-# LiDAR-based checkpoint detection
-if left_distance < THRESHOLD or right_distance < THRESHOLD:
-    # Detect checkpoint passage
-    # Filter and validate checkpoint
-    # Record optimal passage point
-```
-
-### Pathfinding System
-
-The A* algorithm implementation includes:
-- **Node connections**: Automatic checkpoint connectivity
-- **Optimal routing**: Shortest path calculation
-- **Dynamic optimization**: Real-time path adjustments
-
-### Data Recording
-
-Each flight session records:
-- **Position data**: 3D coordinates with timestamps
-- **Orientation**: Roll, pitch, yaw angles
-- **Velocity**: 3D velocity vectors
-- **Sensor readings**: LiDAR distances
-- **Performance metrics**: Speed, acceleration, stability
-
-## Data Analysis & Visualization
-
-### Performance Analytics
-
-The system provides comprehensive analysis:
-
-```python
-# Load and analyze route data
-python -c "
-from route_visualizer import visualize_route, analyze_performance
-visualize_route()  # All laps
-analyze_performance()  # Performance metrics
-"
-```
-
-### Available Visualizations
-
-1. **3D Flight Trajectories**: Complete route visualization
-2. **Speed Profiles**: Velocity analysis over time
-3. **Orientation Tracking**: Attitude stability analysis
-4. **LiDAR Data**: Obstacle detection patterns
-5. **Lap Comparisons**: Multi-lap performance comparison
-6. **Checkpoint Analysis**: Checkpoint passage optimization
-
-### Sample Output
+## Repository layout
 
 ```
-=== Performance Analysis ===
-Lap 1 Analysis:
-  Duration: 45.2s
-  Total Distance: 156.8m
-  Average Speed: 3.47 m/s
-  Max Speed: 5.21 m/s
-  Checkpoint Times: [12.3s, 24.1s, 36.8s, 45.2s]
+controllers/dcl_sim_bridge/    Webots controller = competition simulator replica
+  dcl_sim_bridge.py            main loop: sensors -> telemetry, control in, race mgmt
+  flight_controller.py         "stabilized controller": NED setpoints -> motors
+  mavlink_server.py            MAVLink 2 UDP server (telemetry, commands, track data)
+  vision_streamer.py           640x360 JPEG @30 Hz, chunked UDP per spec 4.6
+  race_manager.py              gate discovery, passage detection, timing, collisions
+  frames.py / wire.py          ENU<->NED math, binary payload formats
+  pilot_launcher.py            auto-spawns pilot/main.py (ICARUS_AUTOPILOT=0 to disable)
+
+pilot/                         THE COMPETITION ENTRY (portable, spec-only interfaces)
+  main.py                      entry point + control loop (50 Hz)
+  config.py                    every tunable in one place
+  comms/mavlink_io.py          telemetry RX, heartbeat/timesync TX, setpoint TX
+  comms/vision_rx.py           JPEG chunk reassembly -> latest-frame buffer
+  perception/gate_detector.py  HSV red mask -> inner-quad PnP pose (spec intrinsics)
+  planning/track.py            gate map from track data + vision corrections
+  planning/racing_line.py      approach/center/exit waypoints, carrot, speed plan
+  guidance.py                  INIT -> ARM -> TAKEOFF -> RACE -> FINISH state machine
+  state.py / frames.py         thread-safe shared state, NED/FRD/camera math
+  logging_util.py              per-run CSV/event/summary logs in runs/
+
+worlds/Qualifier1.wbt          start + 9 intermediate + finish gates, obstacles
+worlds/Qualifier2.wbt          harder: tighter spacing, sharper turns, altitude swings
+protos/QualifierGate.proto     spec-dimension gate (2.7 m outer, 1.5 m inner, 0.26 m deep)
+tests/                         31 unit tests (pytest)
+tools/race.sh                  one-command headless qualifier run
+
+controllers/main_controller/   legacy manual-flight / early prototype (kept for reference)
 ```
 
-## Results & Visualizations
+## Spec compliance (what the bridge replicates, what the pilot consumes)
 
-### Flight Trajectory Analysis
+| Spec item | Implementation |
+|---|---|
+| 3.2 Physics 120 Hz | `basicTimeStep 8` ms |
+| 3.7 Gate 2.7 m / 1.5 m / 0.26 m | `protos/QualifierGate.proto` |
+| 3.8 NED frames, camera 20° up, 640×360, fx=fy=320, cx,cy=(320,180) | world camera + `frames.py` both sides |
+| 4.2/4.3 MAVLink 2 UDP: HEARTBEAT, ATTITUDE, HIGHRES_IMU, LOCAL_POSITION_NED, ODOMETRY, TIMESYNC, SET_POSITION_TARGET_LOCAL_NED, SET_ATTITUDE_TARGET, COLLISION, ENCAPSULATED_DATA | `mavlink_server.py` / `mavlink_io.py` |
+| 4.4 Command < 100 Hz, heartbeat ≥ 2 Hz | pilot streams setpoints at 50 Hz, heartbeats at 4 Hz |
+| 4.6 Vision stream: UDP 5600, 24 B header `<IHHIIQ`, chunked JPEG, 30 Hz | `vision_streamer.py` / `vision_rx.py` |
+| Race status + track info `ENCAPSULATED_DATA` (formats from the official example client) | `wire.py`, round-trip unit tested |
+| ARM/DISARM, SIM_RESET (31000) | `COMMAND_LONG` handling in the bridge |
+| 8.3 Max run 8 min | bridge `ICARUS_MAX_SIM_T` watchdog |
 
-<div align="center">
+The connection model matches the official PyAIPilotExample: the **client
+listens** (`udpin 0.0.0.0:14550`, vision bind `:5600`) and the simulator
+transmits to it.
 
-#### 3D Route Visualization
-![3D Flight Trajectory](assets/3d-trajectory.png)
-*Drone'un 3 boyutlu uçuş rotası ve checkpoint'lerin konumları*
+## How the pilot races
 
-#### Performance Comparison
-![Multi-Lap Performance](assets/multi-lap-comparison.png)
-*Çoklu tur performans karşılaştırması ve iyileştirme trendi*
+1. **INIT** — waits for telemetry and the track description (gate poses in
+   NED, transmitted by the sim as chunked `ENCAPSULATED_DATA`).
+2. **ARM / TAKEOFF** — arms, climbs at the first gate's altitude, aims the
+   nose (and therefore the camera) at gate 0.
+3. **RACE** — for each gate the planner lays *approach → center → exit*
+   waypoints along the gate normal. A carrot point (lookahead grows with
+   planned speed) is chased with velocity+yaw setpoints. Speed is scheduled:
+   cruise on straights, braking profiles into gates, gate speed shaped by
+   how sharp the next heading change is. Yaw always points the camera at the
+   next gate to be crossed.
+4. **Perception in the loop** — every camera frame is HSV-masked for the
+   red frame; the inner opening's four corners go through `solvePnP`
+   (IPPE, planar square of known 1.5 m size) with hard rejection filters
+   (reprojection error, range, aspect, opening ratio). Accepted detections
+   are fused as bounded, smoothed per-gate corrections to the track map —
+   so telemetry drift relative to what the camera actually sees is cancelled
+   near every gate.
+5. **FINISH** — crossing the finish gate stops the clock (race status from
+   the sim is authoritative); the pilot holds position and writes
+   `runs/run_*/summary.json`, a full CSV flight log and an event log.
 
-</div>
+## Tuning
 
+Everything lives in `pilot/config.py`:
 
-## Data Storage
+- `v_cruise / v_gate / decel` — the speed envelope. Current values finish
+  Qualifier 1 in ~40 s with zero collisions; raise for more risk.
+- `approach_dist / exit_dist` — how far out the gate-threading waypoints sit.
+- `lookahead*` — carrot geometry (responsiveness vs corner-cutting).
+- `correction_*` — vision-fusion aggressiveness.
 
-The system automatically saves:
+Bridge-side flight-controller limits (tilt cap, velocity caps) are in
+`controllers/dcl_sim_bridge/flight_controller.py`.
 
-- `checkpoints.json`: Checkpoint positions and metadata
-- `route_data_lap_X.json`: Detailed flight data for each lap
-- Performance logs and analysis results
+## Environment variables
 
-### Data Structure
-
-```json
-{
-  "lap_number": 1,
-  "start_time": "2025-01-XX",
-  "checkpoint_times": {...},
-  "points": [
-    {
-      "timestamp": 0.0,
-      "position": [x, y, z],
-      "orientation": [roll, pitch, yaw],
-      "velocity": [vx, vy, vz],
-      "lidar_readings": {...}
-    }
-  ]
-}
-```
-
-## Performance Features
-
-### Multi-Lap System
-- Automated multi-lap course completion
-- Configurable lap count (default: 3 laps)
-- Real-time lap timing and statistics
-- Performance comparison between laps
-
-### Optimization Features
-- **Smooth Trajectory Planning**: Minimizes sharp turns
-- **Stabilization Control**: Maintains flight stability
-- **Checkpoint Optimization**: Optimal passage point detection
-
-## Configuration
-
-### Flight Parameters (in `octopus.py`)
-
-```python
-FLYING_ATTITUDE = 3.0        # Default hover altitude (m)
-TARGET_THRESHOLD = 0.1       # Position accuracy (m)
-MAX_VELOCITY = 1.0           # Maximum flight speed (m/s)
-LIDAR_THRESHOLD = 0.5        # Checkpoint detection threshold (m)
-```
-
-### PID Controller Gains (in `pid_controller.py`)
-
-```python
-gains = {
-    "kp_att_y": 1,           # Yaw proportional gain
-    "kd_att_y": 0.5,         # Yaw derivative gain
-    "kp_att_rp": 0.5,        # Roll/Pitch proportional gain
-    "kd_att_rp": 0.1,        # Roll/Pitch derivative gain
-    "kp_vel_xy": 2,          # Velocity proportional gain
-    "kd_vel_xy": 0.5,        # Velocity derivative gain
-    "kp_z": 10,              # Altitude proportional gain
-    "ki_z": 5,               # Altitude integral gain
-    "kd_z": 5                # Altitude derivative gain
-}
-```
-
-## Course Design
-
-The parkour course (`worlds/Parkour.wbt`) features:
-- **Circular obstacles**: Red pipe checkpoints for navigation
-- **Complex geometry**: Requires precise maneuvering
-
-## Research Applications
-This project serves as a platform for:
-- **Autonomous navigation research**: Path planning algorithms
-- **Control system development**: PID and advanced controllers
-- **Sensor fusion studies**: Multi-sensor integration
-- **Performance optimization**: Flight efficiency analysis
-- **Machine learning**: Data collection for AI training
+| Variable | Default | Effect |
+|---|---|---|
+| `ICARUS_AUTOPILOT` | `1` | bridge auto-launches `pilot/main.py` |
+| `ICARUS_AUTOQUIT` | `0` | quit Webots when the race ends (batch/CI) |
+| `ICARUS_MAX_SIM_T` | `480` | sim-time cap for auto-quit runs (s) |
+| `ICARUS_CLIENT_IP` | `127.0.0.1` | where the bridge sends MAVLink + video |
+| `ICARUS_VIZ` | `0` | pilot shows live annotated detection window |
+| `ICARUS_SAVE_FRAMES` | `0` | pilot saves annotated frames to the run dir |
